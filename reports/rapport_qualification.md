@@ -179,6 +179,8 @@ Pour montrer qu'un test qui échoue bloque bien le workflow, j'ai ajouté une op
 
 En local, Ruff ne trouve aucune erreur, 209 tests passent, 1 est ignoré et 2 sont en `xfail`, avec 98 % de couverture en lignes et en branches. Le dépôt est en ligne à l'adresse https://github.com/Umm-abdallah/CreditRisk-Test. La première exécution du workflow sur GitHub est passée au vert sur les trois jobs (qualité, tests et non-régression).
 
+![Exécution réussie après un push](preuves/ci_execution_reussie.png)
+
 J'ai ensuite lancé le workflow à la main avec l'option `forcer_echec`. Le job de tests a échoué sur `test_echec_volontaire` (1 échec et 209 tests réussis) et le job de non-régression ne s'est pas lancé. Le workflow bloque donc bien dès qu'un test échoue.
 
 ![Exécution manuelle avec échec volontaire](preuves/ci_echec_volontaire.png)

@@ -1,0 +1,6 @@
+........................................................................ [ 84%]
+..........x.x                                                            [100%]
+=========================== short test summary info ============================
+XFAIL tests/test_robustness.py::test_rob08_risque_decroissant_avec_revenu_dans_le_domaine - ANO-02 : v1.0.0 non monotone en revenu au delà de 500 000 FCFA
+XFAIL tests/test_robustness.py::test_rob08_risque_decroissant_avec_revenu_hors_domaine - ANO-02 : extrapolation non monotone de v1.0.0 au delà du domaine
+83 passed, 2 xfailed in 2.19s

@@ -1,0 +1,118 @@
+name: Tests et qualification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      forcer_echec:
+        description: "Activer le test volontairement défaillant (preuve que le workflow bloque)"
+        type: boolean
+        default: false
+      modele_candidat:
+        description: "Modèle candidat pour la non-régression"
+        type: string
+        default: "models/model_v1.3.0.joblib"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  qualite:
+    name: Qualité du code (Ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff==0.17.4
+      - name: Lint
+        run: ruff check . --output-format=github
+      - name: Formatage
+        run: ruff format --check .
+
+  tests:
+    name: Tests (validation, API, intégration, robustesse, non-régression)
+    runs-on: ubuntu-latest
+    needs: qualite
+    timeout-minutes: 15
+    env:
+      FORCER_ECHEC: ${{ github.event.inputs.forcer_echec == 'true' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Installer l'environnement figé
+        run: pip install -r requirements-dev.txt
+      - name: Vérifier l'intégrité des modèles versionnés
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          sys.path.insert(0, ".")
+          from app.prediction import sha256_fichier
+          for meta in sorted(pathlib.Path("models").glob("*.json")):
+              attendu = json.loads(meta.read_text())["sha256"]
+              obtenu = sha256_fichier(meta.with_suffix(".joblib"))
+              print(meta.stem, "OK" if attendu == obtenu else "ALTERE")
+              assert attendu == obtenu
+          EOF
+      - name: Suite complète avec couverture (modèle de référence 1.0.0)
+        run: >
+          pytest -v --cov=app --cov-branch --cov-report=term-missing
+          --cov-report=xml --cov-report=html --junitxml=reports/junit.xml
+      - name: Résumé dans l'interface GitHub
+        if: always()
+        run: |
+          echo "## Couverture" >> $GITHUB_STEP_SUMMARY
+          python -c "import xml.etree.ElementTree as E; r=E.parse('coverage.xml').getroot(); print(f\"Couverture des lignes : {float(r.get('line-rate'))*100:.1f} %\")" >> $GITHUB_STEP_SUMMARY || true
+      - name: Publier les rapports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-tests
+          path: |
+            coverage.xml
+            htmlcov/
+            reports/junit.xml
+
+  non-regression:
+    name: Non-régression du modèle candidat
+    runs-on: ubuntu-latest
+    needs: tests
+    timeout-minutes: 10
+    env:
+      MODELE_CANDIDAT: ${{ github.event.inputs.modele_candidat || 'models/model_v1.3.0.joblib' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Comparer toutes les versions à la référence (rapport)
+        run: |
+          python scripts/compare_versions.py 1.1.0 1.2.0 1.3.0
+          cat reports/rapport_non_regression.md >> $GITHUB_STEP_SUMMARY
+      - name: Contrôle bloquant du candidat
+        run: pytest tests/test_regression.py tests/test_api.py tests/test_integration.py -v
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rapport-non-regression
+          path: |
+            reports/rapport_non_regression.md
+            reports/non_regression.json

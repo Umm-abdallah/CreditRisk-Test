@@ -1,0 +1,278 @@
+...........................................FF................F..FFFFF... [ 84%]
+...FFF....F.x                                                            [100%]
+=================================== FAILURES ===================================
+_______________________ test_rob03_entier_demesure[5000] _______________________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+chiffres = 5000
+
+    @pytest.mark.parametrize("chiffres", [400, 5000])
+    def test_rob03_entier_demesure(client, chiffres):
+        """Entier JSON de plusieurs milliers de chiffres : rejet propre attendu (ANO-01)."""
+        r = client.post("/predict", content=corps_brut("revenu_mensuel", "9" * chiffres), headers=ENTETE_JSON)
+        assert r.status_code in (400, 422)
+>       verifier_erreur_propre(r, r.status_code, "REQUETE_MAL_FORMEE" if r.status_code == 400 else "DONNEES_INVALIDES")
+
+tests/test_robustness.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+response = <Response [400 Bad Request]>, statut = 400
+code = 'REQUETE_MAL_FORMEE'
+
+    def verifier_erreur_propre(response, statut: int, code: str) -> dict:
+        """Vérifie le contrat d'erreur et l'absence de fuite technique."""
+        assert response.status_code == statut, response.text
+        corps = response.json()
+>       assert set(corps) == {"erreur", "id_requete"}
+E       AssertionError: assert {'detail'} == {'erreur', 'id_requete'}
+E         
+E         Extra items in the left set:
+E         'detail'
+E         Extra items in the right set:
+E         'id_requete'
+E         'erreur'
+E         Use -v to get more diff
+
+tests/conftest.py:60: AssertionError
+____________________ test_rob03_json_profondement_imbrique _____________________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+
+    def test_rob03_json_profondement_imbrique(client):
+        """Imbrication extrême : rejet propre au format du contrat (ANO-01)."""
+        r = client.post("/predict", content="[" * 50_000 + "]" * 50_000, headers=ENTETE_JSON)
+>       verifier_erreur_propre(r, 400, "REQUETE_MAL_FORMEE")
+
+tests/test_robustness.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+response = <Response [400 Bad Request]>, statut = 400
+code = 'REQUETE_MAL_FORMEE'
+
+    def verifier_erreur_propre(response, statut: int, code: str) -> dict:
+        """Vérifie le contrat d'erreur et l'absence de fuite technique."""
+        assert response.status_code == statut, response.text
+        corps = response.json()
+>       assert set(corps) == {"erreur", "id_requete"}
+E       AssertionError: assert {'detail'} == {'erreur', 'id_requete'}
+E         
+E         Extra items in the left set:
+E         'detail'
+E         Extra items in the right set:
+E         'id_requete'
+E         'erreur'
+E         Use -v to get more diff
+
+tests/conftest.py:60: AssertionError
+___________ test_rob04_limite_invalide[{"montant_credit": 9999.99}] ____________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'montant_credit': 9999.99}
+
+    @pytest.mark.parametrize("modif", LIMITES_INVALIDES, ids=lambda m: json.dumps(m))
+    def test_rob04_limite_invalide(client, modif):
+>       verifier_erreur_propre(client.post("/predict", json={**DEMANDE_VALIDE, **modif}), 422, "DONNEES_INVALIDES")
+
+tests/test_robustness.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+response = <Response [200 OK]>, statut = 422, code = 'DONNEES_INVALIDES'
+
+    def verifier_erreur_propre(response, statut: int, code: str) -> dict:
+        """Vérifie le contrat d'erreur et l'absence de fuite technique."""
+>       assert response.status_code == statut, response.text
+E       AssertionError: {"probabilite_defaut":0.380083,"classe_risque":"modere","decision_suggeree":"analyse_complementaire","alertes":["HORS_DOMAINE_ENTRAINEMENT:montant_credit"],"version_modele":"1.0.0","id_requete":"f3a3d346-d7bb-49e0-ab8c-ae77f9aab26a","avertissement":"Aide à la décision : la décision finale relève de l'agent de crédit."}
+E       assert 200 == 422
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/conftest.py:58: AssertionError
+_ test_rob05_hors_domaine_accepte_avec_alerte[{"age": 75, "anciennete_activite": 50}-age] _
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'age': 75, 'anciennete_activite': 50}, champ = 'age'
+
+    @pytest.mark.parametrize("modif,champ", HORS_DOMAINE, ids=lambda x: json.dumps(x) if isinstance(x, dict) else x)
+    def test_rob05_hors_domaine_accepte_avec_alerte(client, modif, champ):
+        r = client.post("/predict", json={**DEMANDE_VALIDE, **modif})
+        assert r.status_code == 200
+        corps = r.json()
+        contrat_probabilite(corps)
+        assert f"HORS_DOMAINE_ENTRAINEMENT:{champ}" in corps["alertes"]
+        # ANO-02 : une prédiction extrapolée ne doit pas produire une décision automatique
+>       assert corps["decision_suggeree"] == "analyse_manuelle_hors_domaine"
+E       AssertionError: assert 'avis_favorable_sous_reserve' == 'analyse_manu..._hors_domaine'
+E         
+E         - analyse_manuelle_hors_domaine
+E         + avis_favorable_sous_reserve
+
+tests/test_robustness.py:139: AssertionError
+_ test_rob05_hors_domaine_accepte_avec_alerte[{"revenu_mensuel": 10000000}-revenu_mensuel] _
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'revenu_mensuel': 10000000}, champ = 'revenu_mensuel'
+
+    @pytest.mark.parametrize("modif,champ", HORS_DOMAINE, ids=lambda x: json.dumps(x) if isinstance(x, dict) else x)
+    def test_rob05_hors_domaine_accepte_avec_alerte(client, modif, champ):
+        r = client.post("/predict", json={**DEMANDE_VALIDE, **modif})
+        assert r.status_code == 200
+        corps = r.json()
+        contrat_probabilite(corps)
+        assert f"HORS_DOMAINE_ENTRAINEMENT:{champ}" in corps["alertes"]
+        # ANO-02 : une prédiction extrapolée ne doit pas produire une décision automatique
+>       assert corps["decision_suggeree"] == "analyse_manuelle_hors_domaine"
+E       AssertionError: assert 'dossier_a_ri...e_avis_comite' == 'analyse_manu..._hors_domaine'
+E         
+E         - analyse_manuelle_hors_domaine
+E         + dossier_a_risque_eleve_avis_comite
+
+tests/test_robustness.py:139: AssertionError
+_ test_rob05_hors_domaine_accepte_avec_alerte[{"revenu_mensuel": 5000}-revenu_mensuel] _
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'revenu_mensuel': 5000}, champ = 'revenu_mensuel'
+
+    @pytest.mark.parametrize("modif,champ", HORS_DOMAINE, ids=lambda x: json.dumps(x) if isinstance(x, dict) else x)
+    def test_rob05_hors_domaine_accepte_avec_alerte(client, modif, champ):
+        r = client.post("/predict", json={**DEMANDE_VALIDE, **modif})
+        assert r.status_code == 200
+        corps = r.json()
+        contrat_probabilite(corps)
+        assert f"HORS_DOMAINE_ENTRAINEMENT:{champ}" in corps["alertes"]
+        # ANO-02 : une prédiction extrapolée ne doit pas produire une décision automatique
+>       assert corps["decision_suggeree"] == "analyse_manuelle_hors_domaine"
+E       AssertionError: assert 'dossier_a_ri...e_avis_comite' == 'analyse_manu..._hors_domaine'
+E         
+E         - analyse_manuelle_hors_domaine
+E         + dossier_a_risque_eleve_avis_comite
+
+tests/test_robustness.py:139: AssertionError
+_ test_rob05_hors_domaine_accepte_avec_alerte[{"montant_credit": 400000000, "duree_mois": 60}-montant_credit] _
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'montant_credit': 400000000, 'duree_mois': 60}
+champ = 'montant_credit'
+
+    @pytest.mark.parametrize("modif,champ", HORS_DOMAINE, ids=lambda x: json.dumps(x) if isinstance(x, dict) else x)
+    def test_rob05_hors_domaine_accepte_avec_alerte(client, modif, champ):
+        r = client.post("/predict", json={**DEMANDE_VALIDE, **modif})
+        assert r.status_code == 200
+        corps = r.json()
+        contrat_probabilite(corps)
+        assert f"HORS_DOMAINE_ENTRAINEMENT:{champ}" in corps["alertes"]
+        # ANO-02 : une prédiction extrapolée ne doit pas produire une décision automatique
+>       assert corps["decision_suggeree"] == "analyse_manuelle_hors_domaine"
+E       AssertionError: assert 'dossier_a_ri...e_avis_comite' == 'analyse_manu..._hors_domaine'
+E         
+E         - analyse_manuelle_hors_domaine
+E         + dossier_a_risque_eleve_avis_comite
+
+tests/test_robustness.py:139: AssertionError
+__ test_rob05_hors_domaine_accepte_avec_alerte[{"duree_mois": 60}-duree_mois] __
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+modif = {'duree_mois': 60}, champ = 'duree_mois'
+
+    @pytest.mark.parametrize("modif,champ", HORS_DOMAINE, ids=lambda x: json.dumps(x) if isinstance(x, dict) else x)
+    def test_rob05_hors_domaine_accepte_avec_alerte(client, modif, champ):
+        r = client.post("/predict", json={**DEMANDE_VALIDE, **modif})
+        assert r.status_code == 200
+        corps = r.json()
+        contrat_probabilite(corps)
+        assert f"HORS_DOMAINE_ENTRAINEMENT:{champ}" in corps["alertes"]
+        # ANO-02 : une prédiction extrapolée ne doit pas produire une décision automatique
+>       assert corps["decision_suggeree"] == "analyse_manuelle_hors_domaine"
+E       AssertionError: assert 'avis_favorable_sous_reserve' == 'analyse_manu..._hors_domaine'
+E         
+E         - analyse_manuelle_hors_domaine
+E         + avis_favorable_sous_reserve
+
+tests/test_robustness.py:139: AssertionError
+________ test_rob06_erreurs_http_au_format_du_contrat[/inexistant-get] _________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+route = '/inexistant', methode = 'get'
+
+    @pytest.mark.parametrize("route,methode", [("/inexistant", "get"), ("/predict", "get"), ("/health", "post")])
+    def test_rob06_erreurs_http_au_format_du_contrat(client, route, methode):
+        """404 et 405 doivent respecter le contrat d'erreur (ANO-01)."""
+        r = getattr(client, methode)(route)
+        assert r.status_code in (404, 405)
+>       assert set(r.json()) == {"erreur", "id_requete"}
+E       AssertionError: assert {'detail'} == {'erreur', 'id_requete'}
+E         
+E         Extra items in the left set:
+E         'detail'
+E         Extra items in the right set:
+E         'id_requete'
+E         'erreur'
+E         Use -v to get more diff
+
+tests/test_robustness.py:172: AssertionError
+__________ test_rob06_erreurs_http_au_format_du_contrat[/predict-get] __________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+route = '/predict', methode = 'get'
+
+    @pytest.mark.parametrize("route,methode", [("/inexistant", "get"), ("/predict", "get"), ("/health", "post")])
+    def test_rob06_erreurs_http_au_format_du_contrat(client, route, methode):
+        """404 et 405 doivent respecter le contrat d'erreur (ANO-01)."""
+        r = getattr(client, methode)(route)
+        assert r.status_code in (404, 405)
+>       assert set(r.json()) == {"erreur", "id_requete"}
+E       AssertionError: assert {'detail'} == {'erreur', 'id_requete'}
+E         
+E         Extra items in the left set:
+E         'detail'
+E         Extra items in the right set:
+E         'id_requete'
+E         'erreur'
+E         Use -v to get more diff
+
+tests/test_robustness.py:172: AssertionError
+__________ test_rob06_erreurs_http_au_format_du_contrat[/health-post] __________
+
+client = <starlette.testclient.TestClient object at 0x7febd5499d30>
+route = '/health', methode = 'post'
+
+    @pytest.mark.parametrize("route,methode", [("/inexistant", "get"), ("/predict", "get"), ("/health", "post")])
+    def test_rob06_erreurs_http_au_format_du_contrat(client, route, methode):
+        """404 et 405 doivent respecter le contrat d'erreur (ANO-01)."""
+        r = getattr(client, methode)(route)
+        assert r.status_code in (404, 405)
+>       assert set(r.json()) == {"erreur", "id_requete"}
+E       AssertionError: assert {'detail'} == {'erreur', 'id_requete'}
+E         
+E         Extra items in the left set:
+E         'detail'
+E         Extra items in the right set:
+E         'id_requete'
+E         'erreur'
+E         Use -v to get more diff
+
+tests/test_robustness.py:172: AssertionError
+__________ test_rob08_risque_decroissant_avec_revenu_dans_le_domaine ___________
+
+proba = <function proba.<locals>.<lambda> at 0x7febc55759e0>
+
+    def test_rob08_risque_decroissant_avec_revenu_dans_le_domaine(proba):
+        valeurs = [proba(revenu_mensuel=r) for r in (30_000, 100_000, 250_000, 500_000, 1_000_000, 1_800_000)]
+>       assert _non_decroissante(valeurs[::-1]), valeurs
+E       AssertionError: [0.9909350118355095, 0.5929458549915404, 0.35446306133810773, 0.31590777749200355, 0.35173768769895886, 0.4544151820773302]
+E       assert False
+E        +  where False = _non_decroissante([0.4544151820773302, 0.35173768769895886, 0.31590777749200355, 0.35446306133810773, 0.5929458549915404, 0.9909350118355095])
+
+tests/test_robustness.py:226: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_robustness.py::test_rob03_entier_demesure[5000] - Assertion...
+FAILED tests/test_robustness.py::test_rob03_json_profondement_imbrique - Asse...
+FAILED tests/test_robustness.py::test_rob04_limite_invalide[{"montant_credit": 9999.99}]
+FAILED tests/test_robustness.py::test_rob05_hors_domaine_accepte_avec_alerte[{"age": 75, "anciennete_activite": 50}-age]
+FAILED tests/test_robustness.py::test_rob05_hors_domaine_accepte_avec_alerte[{"revenu_mensuel": 10000000}-revenu_mensuel]
+FAILED tests/test_robustness.py::test_rob05_hors_domaine_accepte_avec_alerte[{"revenu_mensuel": 5000}-revenu_mensuel]
+FAILED tests/test_robustness.py::test_rob05_hors_domaine_accepte_avec_alerte[{"montant_credit": 400000000, "duree_mois": 60}-montant_credit]
+FAILED tests/test_robustness.py::test_rob05_hors_domaine_accepte_avec_alerte[{"duree_mois": 60}-duree_mois]
+FAILED tests/test_robustness.py::test_rob06_erreurs_http_au_format_du_contrat[/inexistant-get]
+FAILED tests/test_robustness.py::test_rob06_erreurs_http_au_format_du_contrat[/predict-get]
+FAILED tests/test_robustness.py::test_rob06_erreurs_http_au_format_du_contrat[/health-post]
+FAILED tests/test_robustness.py::test_rob08_risque_decroissant_avec_revenu_dans_le_domaine
+12 failed, 72 passed, 1 xfailed in 1.98s

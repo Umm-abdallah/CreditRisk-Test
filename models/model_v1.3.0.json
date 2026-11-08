@@ -1,0 +1,54 @@
+{
+  "version": "1.3.0",
+  "algorithme": "HistGradientBoostingClassifier (monotone)",
+  "date_entrainement": "2026-11-08",
+  "graine": 42,
+  "donnees": "synthetiques (scripts/train_model.py) : test du système uniquement",
+  "bruit_etiquettes": 0.0,
+  "equilibrage_classes": true,
+  "contraintes_monotones": true,
+  "variables": [
+    "age",
+    "revenu_mensuel",
+    "montant_credit",
+    "duree_mois",
+    "anciennete_activite",
+    "taux_effort",
+    "log_revenu",
+    "log_montant"
+  ],
+  "seuil_decision": 0.5,
+  "metriques_test": {
+    "rappel": 0.749,
+    "precision": 0.6285,
+    "f1": 0.6835,
+    "auc": 0.8791,
+    "taux_faux_negatifs": 0.251,
+    "n_test": 1800,
+    "taux_defaut_test": 0.2811
+  },
+  "domaine_entrainement": {
+    "age": [
+      18.0,
+      70.0
+    ],
+    "revenu_mensuel": [
+      30000.0,
+      1822000.0
+    ],
+    "montant_credit": [
+      70000.0,
+      19380000.0
+    ],
+    "duree_mois": [
+      3.0,
+      48.0
+    ],
+    "anciennete_activite": [
+      0.1,
+      28.6
+    ]
+  },
+  "sklearn_version": "1.9.1",
+  "sha256": "5ca1f9909c04de69942884879ea0ffbdc23831b64f2c5366542678bf944c4cfc"
+}

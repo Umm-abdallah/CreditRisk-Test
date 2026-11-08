@@ -1,0 +1,26 @@
+....F...s...                                                             [100%]
+=================================== FAILURES ===================================
+________________________ test_reg03_predictions_jeu_or _________________________
+
+candidat = HistGradientBoostingClassifier(class_weight='balanced', learning_rate=0.08,
+                               max_depth=3, max_iter=200, random_state=42)
+
+    def test_reg03_predictions_jeu_or(candidat):
+        proba = candidat.predict_proba(matrice_variables(JEU_OR))[:, 1]
+        ref = np.array(REFERENCE["probabilites_jeu_or"])
+        ecart = np.abs(proba - ref)
+        if MEME_VERSION:
+            assert ecart.max() <= TOL["ecart_max_proba_meme_version"]
+        else:
+>           assert ecart.max() <= TOL["ecart_max_proba_nouvelle_version"], f"écart max {ecart.max():.3f}"
+E           AssertionError: écart max 0.212
+E           assert np.float64(0.21241460516089364) <= 0.15
+E            +  where np.float64(0.21241460516089364) = <built-in method max of numpy.ndarray object at 0x7fbc86bdf390>()
+E            +    where <built-in method max of numpy.ndarray object at 0x7fbc86bdf390> = array([7.53649580e-02, 5.17073216e-02, 3.28333121e-02, 4.58108630e-02,\n       1.15206941e-01, 5.67920826e-02, 1.521375...9.06514477e-02, 7.36460626e-02, 3.22609186e-02,\n       1.88892223e-01, 9.71579042e-02, 1.49925717e-02, 3.49247507e-02]).max
+
+tests/test_regression.py:77: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_regression.py:106: Vérifié sur la version de référence
+FAILED tests/test_regression.py::test_reg03_predictions_jeu_or - AssertionErr...
+1 failed, 10 passed, 1 skipped in 1.37s
+exit=1

@@ -1,0 +1,47 @@
+F...F...s...                                                             [100%]
+=================================== FAILURES ===================================
+_________ test_reg01_pas_de_baisse_excessive[rappel-baisse_max_rappel] _________
+
+metriques_candidat = {'rappel': 0.6067, 'precision': 0.832, 'f1': 0.7017, 'auc': 0.8842, ...}
+metrique = 'rappel', cle_tol = 'baisse_max_rappel'
+
+    @pytest.mark.parametrize(
+        "metrique,cle_tol",
+        [("rappel", "baisse_max_rappel"), ("f1", "baisse_max_f1"), ("auc", "baisse_max_auc")],
+    )
+    def test_reg01_pas_de_baisse_excessive(metriques_candidat, metrique, cle_tol):
+        ref = REFERENCE["metriques_test"][metrique]
+        obs = metriques_candidat[metrique]
+>       assert obs >= ref - TOL[cle_tol], (
+            f"Régression sur {metrique} : {obs:.4f} contre {ref:.4f} en référence "
+            f"(baisse {ref - obs:.4f} > tolérance {TOL[cle_tol]})"
+        )
+E       AssertionError: Régression sur rappel : 0.6067 contre 0.7530 en référence (baisse 0.1463 > tolérance 0.03)
+E       assert 0.6067 >= (0.753 - 0.03)
+
+tests/test_regression.py:57: AssertionError
+________________________ test_reg03_predictions_jeu_or _________________________
+
+candidat = Pipeline(steps=[('normalisation', StandardScaler()),
+                ('classifieur', LogisticRegression(max_iter=2000))])
+
+    def test_reg03_predictions_jeu_or(candidat):
+        proba = candidat.predict_proba(matrice_variables(JEU_OR))[:, 1]
+        ref = np.array(REFERENCE["probabilites_jeu_or"])
+        ecart = np.abs(proba - ref)
+        if MEME_VERSION:
+            assert ecart.max() <= TOL["ecart_max_proba_meme_version"]
+        else:
+>           assert ecart.max() <= TOL["ecart_max_proba_nouvelle_version"], f"écart max {ecart.max():.3f}"
+E           AssertionError: écart max 0.231
+E           assert np.float64(0.2312196290878321) <= 0.15
+E            +  where np.float64(0.2312196290878321) = <built-in method max of numpy.ndarray object at 0x7fb5b1163cf0>()
+E            +    where <built-in method max of numpy.ndarray object at 0x7fb5b1163cf0> = array([0.15022269, 0.16432071, 0.15933197, 0.05389982, 0.22919829,\n       0.04769657, 0.18116852, 0.22098297, 0.020685...45, 0.14995533, 0.00105222, 0.22758687, 0.065683  ,\n       0.1080675 , 0.12893143, 0.12118113, 0.03454297, 0.03483824]).max
+
+tests/test_regression.py:77: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_regression.py:106: Vérifié sur la version de référence
+FAILED tests/test_regression.py::test_reg01_pas_de_baisse_excessive[rappel-baisse_max_rappel]
+FAILED tests/test_regression.py::test_reg03_predictions_jeu_or - AssertionErr...
+2 failed, 9 passed, 1 skipped in 1.09s
+exit=1

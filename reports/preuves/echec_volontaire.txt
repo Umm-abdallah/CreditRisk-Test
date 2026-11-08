@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________________ test_echec_volontaire _____________________________
+
+    @pytest.mark.skipif(os.getenv("FORCER_ECHEC") != "1", reason="démonstration activée par FORCER_ECHEC=1")
+    def test_echec_volontaire():
+        probabilite = 1.7
+>       assert 0.0 <= probabilite <= 1.0, "Échec volontaire : le pipeline CI doit être bloqué"
+E       AssertionError: Échec volontaire : le pipeline CI doit être bloqué
+E       assert 1.7 <= 1.0
+
+tests/test_echec_volontaire.py:15: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_echec_volontaire.py::test_echec_volontaire - AssertionError...
+1 failed in 0.02s
+exit=1

@@ -1,0 +1,49 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python
+rootdir: <depot>
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1, cov-7.1.0, locust-2.47.0
+collecting ... collected 40 items
+
+tests/test_api.py::test_api01_requete_valide PASSED                      [  2%]
+tests/test_api.py::test_api02_champ_obligatoire_absent[age] PASSED       [  5%]
+tests/test_api.py::test_api02_champ_obligatoire_absent[revenu_mensuel] PASSED [  7%]
+tests/test_api.py::test_api02_champ_obligatoire_absent[montant_credit] PASSED [ 10%]
+tests/test_api.py::test_api02_champ_obligatoire_absent[duree_mois] PASSED [ 12%]
+tests/test_api.py::test_api02_champ_obligatoire_absent[anciennete_activite] PASSED [ 15%]
+tests/test_api.py::test_api03_age_negatif PASSED                         [ 17%]
+tests/test_api.py::test_api04_revenu_texte[250000] PASSED                [ 20%]
+tests/test_api.py::test_api04_revenu_texte[deux cent mille] PASSED       [ 22%]
+tests/test_api.py::test_api04_revenu_texte[] PASSED                      [ 25%]
+tests/test_api.py::test_api05_montant_nul_ou_negatif[0] PASSED           [ 27%]
+tests/test_api.py::test_api05_montant_nul_ou_negatif[-1] PASSED          [ 30%]
+tests/test_api.py::test_api05_montant_nul_ou_negatif[-1000000] PASSED    [ 32%]
+tests/test_api.py::test_api06_duree_non_entiere[12.5] PASSED             [ 35%]
+tests/test_api.py::test_api06_duree_non_entiere[12.0] PASSED             [ 37%]
+tests/test_api.py::test_api06_duree_non_entiere[12] PASSED               [ 40%]
+tests/test_api.py::test_api07_champ_supplementaire PASSED                [ 42%]
+tests/test_api.py::test_api08_valeurs_extremes_rejetees[revenu_mensuel-1000000000000] PASSED [ 45%]
+tests/test_api.py::test_api08_valeurs_extremes_rejetees[montant_credit-1000000000000000] PASSED [ 47%]
+tests/test_api.py::test_api08_valeurs_extremes_rejetees[age-1000000] PASSED [ 50%]
+tests/test_api.py::test_api08_valeurs_extremes_rejetees[duree_mois-10000] PASSED [ 52%]
+tests/test_api.py::test_api08_valeurs_elevees_mais_valides_avec_alerte PASSED [ 55%]
+tests/test_api.py::test_api09_modele_indisponible_predict PASSED         [ 57%]
+tests/test_api.py::test_api09_modele_indisponible_health PASSED          [ 60%]
+tests/test_api.py::test_api09_modele_indisponible_model_info PASSED      [ 62%]
+tests/test_api.py::test_api10_json_mal_forme[{"age": 35,] PASSED         [ 65%]
+tests/test_api.py::test_api10_json_mal_forme[pas du json] PASSED         [ 67%]
+tests/test_api.py::test_api10_json_mal_forme[{"age": 35 "duree_mois": 12}] PASSED [ 70%]
+tests/test_api.py::test_api10_corps_qui_n_est_pas_un_objet[[1, 2, 3]] PASSED [ 72%]
+tests/test_api.py::test_api10_corps_qui_n_est_pas_un_objet["texte"] PASSED [ 75%]
+tests/test_api.py::test_api10_corps_qui_n_est_pas_un_objet[42] PASSED    [ 77%]
+tests/test_api.py::test_api10_corps_qui_n_est_pas_un_objet[null] PASSED  [ 80%]
+tests/test_api.py::test_api10_corps_vide PASSED                          [ 82%]
+tests/test_api.py::test_api11_health_ok PASSED                           [ 85%]
+tests/test_api.py::test_api12_model_info PASSED                          [ 87%]
+tests/test_api.py::test_api13_methode_non_autorisee PASSED               [ 90%]
+tests/test_api.py::test_api13_route_inconnue PASSED                      [ 92%]
+tests/test_api.py::test_api14_identifiant_de_requete PASSED              [ 95%]
+tests/test_api.py::test_api14_identifiant_present_dans_les_erreurs PASSED [ 97%]
+tests/test_api.py::test_api15_version_coherente PASSED                   [100%]
+
+============================== 40 passed in 0.88s ==============================

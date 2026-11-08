@@ -1,0 +1,9 @@
+{
+  "_commentaire": "Tolérances fixées AVANT la comparaison des versions. Toute baisse au-delà déclenche un échec du contrôle et une investigation.",
+  "baisse_max_rappel": 0.03,
+  "baisse_max_f1": 0.03,
+  "baisse_max_auc": 0.02,
+  "ecart_max_proba_meme_version": 1e-09,
+  "ecart_max_proba_nouvelle_version": 0.15,
+  "part_max_changement_classe_risque": 0.20
+}

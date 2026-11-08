@@ -1,0 +1,102 @@
+{
+  "environnement": {
+    "systeme": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+    "processeur": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "coeurs_logiques": 2,
+    "memoire": "7.8 Go",
+    "python": "3.13.18",
+    "fastapi": "0.162.2",
+    "scikit_learn": "1.9.1",
+    "serveur": "uvicorn, 1 worker, local (127.0.0.1)",
+    "client": "httpx, threads (ThreadPoolExecutor), même machine"
+  },
+  "objectifs": {
+    "p95_ms": 200.0,
+    "debit_req_s": 50.0,
+    "concurrence": 20
+  },
+  "inference": {
+    "inference_modele": {
+      "n": 3000,
+      "moyenne": 0.178,
+      "p50": 0.149,
+      "p95": 0.305,
+      "p99": 0.467,
+      "max": 1.36
+    },
+    "validation_pretraitement_inference": {
+      "n": 3000,
+      "moyenne": 0.17,
+      "p50": 0.159,
+      "p95": 0.216,
+      "p99": 0.263,
+      "max": 3.146
+    }
+  },
+  "api_sequentielle": {
+    "n": 500,
+    "moyenne": 2.123,
+    "p50": 1.984,
+    "p95": 2.96,
+    "p99": 6.045,
+    "max": 9.369
+  },
+  "charge_progressive": [
+    {
+      "concurrence": 1,
+      "n": 400,
+      "moyenne": 2.188,
+      "p50": 2.078,
+      "p95": 2.884,
+      "p99": 3.622,
+      "max": 4.475,
+      "debit_req_s": 451.5,
+      "taux_erreur": 0.0
+    },
+    {
+      "concurrence": 5,
+      "n": 400,
+      "moyenne": 9.964,
+      "p50": 9.929,
+      "p95": 14.753,
+      "p99": 16.557,
+      "max": 18.239,
+      "debit_req_s": 476.4,
+      "taux_erreur": 0.0
+    },
+    {
+      "concurrence": 10,
+      "n": 1000,
+      "moyenne": 15.569,
+      "p50": 15.028,
+      "p95": 21.933,
+      "p99": 26.747,
+      "max": 44.206,
+      "debit_req_s": 619.5,
+      "taux_erreur": 0.0
+    },
+    {
+      "concurrence": 20,
+      "n": 1000,
+      "moyenne": 33.457,
+      "p50": 32.405,
+      "p95": 40.57,
+      "p99": 72.938,
+      "max": 98.054,
+      "debit_req_s": 556.9,
+      "taux_erreur": 0.0
+    },
+    {
+      "concurrence": 50,
+      "n": 1000,
+      "moyenne": 89.532,
+      "p50": 86.869,
+      "p95": 136.507,
+      "p99": 167.036,
+      "max": 196.642,
+      "debit_req_s": 481.6,
+      "taux_erreur": 0.0
+    }
+  ],
+  "objectif_atteint": true
+}

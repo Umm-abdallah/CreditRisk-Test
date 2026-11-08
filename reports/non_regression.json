@@ -1,0 +1,118 @@
+{
+  "reference": {
+    "version": "1.0.0",
+    "metriques": {
+      "rappel": 0.753,
+      "precision": 0.6436,
+      "f1": 0.694,
+      "auc": 0.8841,
+      "taux_faux_negatifs": 0.247,
+      "n_test": 1800,
+      "taux_defaut_test": 0.2811
+    },
+    "fnr_par_duree": {
+      "moins_12_mois": 0.054,
+      "12_23_mois": 0.516,
+      "24_mois_et_plus": 0.83
+    },
+    "monotonie_revenu": false
+  },
+  "tolerances": {
+    "_commentaire": "Tolérances fixées AVANT la comparaison des versions. Toute baisse au-delà déclenche un échec du contrôle et une investigation.",
+    "baisse_max_rappel": 0.03,
+    "baisse_max_f1": 0.03,
+    "baisse_max_auc": 0.02,
+    "ecart_max_proba_meme_version": 1e-09,
+    "ecart_max_proba_nouvelle_version": 0.15,
+    "part_max_changement_classe_risque": 0.2
+  },
+  "candidats": [
+    {
+      "version": "1.1.0",
+      "metriques": {
+        "rappel": 0.7411,
+        "precision": 0.6367,
+        "f1": 0.6849,
+        "auc": 0.8758,
+        "taux_faux_negatifs": 0.2589,
+        "n_test": 1800,
+        "taux_defaut_test": 0.2811
+      },
+      "ecart_proba_max": 0.2124,
+      "ecart_proba_moyen": 0.0645,
+      "part_changement_classe": 0.167,
+      "controles": {
+        "rappel": true,
+        "f1": true,
+        "auc": true,
+        "ecart_proba": false,
+        "changement_classe": true
+      },
+      "verdict": "NON CONFORME",
+      "fnr_par_duree": {
+        "moins_12_mois": 0.065,
+        "12_23_mois": 0.547,
+        "24_mois_et_plus": 0.83
+      },
+      "monotonie_revenu": false
+    },
+    {
+      "version": "1.2.0",
+      "metriques": {
+        "rappel": 0.6067,
+        "precision": 0.832,
+        "f1": 0.7017,
+        "auc": 0.8842,
+        "taux_faux_negatifs": 0.3933,
+        "n_test": 1800,
+        "taux_defaut_test": 0.2811
+      },
+      "ecart_proba_max": 0.2312,
+      "ecart_proba_moyen": 0.1132,
+      "part_changement_classe": 0.15,
+      "controles": {
+        "rappel": false,
+        "f1": true,
+        "auc": true,
+        "ecart_proba": false,
+        "changement_classe": true
+      },
+      "verdict": "NON CONFORME",
+      "fnr_par_duree": {
+        "moins_12_mois": 0.164,
+        "12_23_mois": 0.844,
+        "24_mois_et_plus": 0.989
+      },
+      "monotonie_revenu": false
+    },
+    {
+      "version": "1.3.0",
+      "metriques": {
+        "rappel": 0.749,
+        "precision": 0.6285,
+        "f1": 0.6835,
+        "auc": 0.8791,
+        "taux_faux_negatifs": 0.251,
+        "n_test": 1800,
+        "taux_defaut_test": 0.2811
+      },
+      "ecart_proba_max": 0.1436,
+      "ecart_proba_moyen": 0.0409,
+      "part_changement_classe": 0.117,
+      "controles": {
+        "rappel": true,
+        "f1": true,
+        "auc": true,
+        "ecart_proba": true,
+        "changement_classe": true
+      },
+      "verdict": "CONFORME",
+      "fnr_par_duree": {
+        "moins_12_mois": 0.071,
+        "12_23_mois": 0.5,
+        "24_mois_et_plus": 0.795
+      },
+      "monotonie_revenu": true
+    }
+  ]
+}

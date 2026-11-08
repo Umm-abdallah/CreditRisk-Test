@@ -1,0 +1,30 @@
+[project]
+name = "creditrisk-test"
+version = "1.0.0"
+description = "Qualification d'un système de prédiction du risque de défaut (prototype pédagogique)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/compare_versions.py" = ["E501"]  # lignes de tableaux Markdown générés

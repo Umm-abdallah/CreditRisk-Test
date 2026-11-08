@@ -177,7 +177,7 @@ Pour que l'environnement soit reproductible, j'ai fixé Python 3.13 et toutes le
 
 Pour montrer qu'un test qui échoue bloque bien le workflow, j'ai ajouté une option `forcer_echec` au déclenchement manuel. Elle active `test_echec_volontaire`, qui fait échouer le job de tests. En local, `FORCER_ECHEC=1 pytest` renvoie bien le code de sortie 1 (sortie dans `reports/preuves/echec_volontaire.txt`). Le modèle 1.2.0 fait lui aussi échouer le contrôle de non-régression.
 
-En local, Ruff ne trouve aucune erreur, 209 tests passent, 1 est ignoré et 2 sont en `xfail`, avec 98 % de couverture en lignes et en branches. Il me reste à ajouter l'adresse du dépôt et les captures d'une exécution sur GitHub une fois le code poussé.
+En local, Ruff ne trouve aucune erreur, 209 tests passent, 1 est ignoré et 2 sont en `xfail`, avec 98 % de couverture en lignes et en branches. Le dépôt est en ligne à l'adresse https://github.com/Umm-abdallah/CreditRisk-Test. La première exécution du workflow sur GitHub est passée au vert sur les trois jobs (qualité, tests et non-régression).
 
 ## 8. Limites, recommandations et conclusion
 

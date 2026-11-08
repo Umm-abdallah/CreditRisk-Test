@@ -4,6 +4,10 @@ Projet de test et d'assurance qualité d'un système qui estime le risque de dé
 
 Remarque sur les données : le fichier `data/credit_synthetique.csv` est un jeu synthétique que je génère avec `scripts/train_model.py` (graine 42). Il me sert à tester le système, il ne permet pas de juger la performance réelle d'un modèle de crédit.
 
+Dépôt : https://github.com/Umm-abdallah/CreditRisk-Test
+
+[![Tests et qualification](https://github.com/Umm-abdallah/CreditRisk-Test/actions/workflows/tests.yml/badge.svg)](https://github.com/Umm-abdallah/CreditRisk-Test/actions/workflows/tests.yml)
+
 ## Architecture
 
 ```
